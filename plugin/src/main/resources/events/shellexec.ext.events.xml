@@ -1,0 +1,19 @@
+<events xmlns="http://xmlns.opennms.org/xsd/eventconf">
+    <event>
+        <uei>uei.opennms.org/shellexecutor/executionSuccessful</uei>
+        <event-label>ShellExecutor: Execution Successful</event-label>
+        <descr>ShellExecutor: Successfully executed '%parm[command]%' for alarm '%parm[reductionKey]%' with output: %parm[commandOutput]%</descr>
+        <logmsg dest="logndisplay">Successfully executed command '%parm[command]%' for alarm with reduction key: %parm[reductionKey]%.</logmsg>
+        <severity>Normal</severity>
+        <alarm-data reduction-key="%uei%:%parm[pid]%:%parm[reductionKey]%" alarm-type="2"
+                    clear-key="uei.opennms.org/shellexecutor/executionFailed:%parm[pid]%:%parm[reductionKey]%"/>
+    </event>
+    <event>
+        <uei>uei.opennms.org/shellexecutor/executionFailed</uei>
+        <event-label>ShellExecutor: Failed to execute command</event-label>
+        <descr>ShellExecutor: Failed to execute '%parm[command]%' for alarm '%parm[reductionKey]%' with output: %parm[commandOutput]%</descr>
+        <logmsg dest="logndisplay">Failed to execute command '%parm[command]%' for alarm with reduction key: %parm[reductionKey]%</logmsg>
+        <severity>Major</severity>
+        <alarm-data reduction-key="%uei%:%parm[pid]%:%parm[reductionKey]%" alarm-type="1" />
+    </event>
+</events>
