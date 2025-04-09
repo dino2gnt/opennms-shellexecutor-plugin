@@ -8,12 +8,12 @@ This plugin is compatible with OpenNMS Horizon 33.1.4 or higher.
 
 ## Usage
 
-Copy the plugin's .kar file into your OpenNMS deploy directory i.e.:
+#### Copy the plugin's .kar file into your OpenNMS deploy directory i.e.:
 ```
 sudo cp opennms-shellexecutor-plugin.kar /opt/opennms/deploy/
 ```
 
-Configure the plugin to be installed when OpenNMS starts:
+#### Configure the plugin to be installed when OpenNMS starts:
 ```
 echo 'opennms-plugins-shellexecutor wait-for-kar=opennms-shellexecutor-plugin' | sudo tee /opt/opennms/etc/featuresBoot.d/shellexecutor.boot
 ```
@@ -26,7 +26,7 @@ feature:install opennms-plugins-shellexecutor
 
 Create a directory `$OPENNMS_HOME/etc/shellExecScripts` for your executable scripts.  This is the working directory for everything executed by the shellexecutor plugin. Commands must exist at this location and be executable by the user as which OpenNMS runs (typically `opennms`).
 
-Configure global options (affects all services for this instance):
+#### Configure global options (affects all services for this instance):
 ```
 config:edit org.opennms.plugins.shellexecutor
 property-set alarmDetailsUrlPattern 'http://"YOUR-OPENNMS-FQDN"/opennms/alarm/detail.htm?id=%d'
@@ -34,7 +34,7 @@ config:update
 ```
 > Use the IP address or hostname of your OpenNMS server (e.g., 127.0.0.1:8980).
 
-Configure services:
+#### Configure services:
 ```
 config:edit --alias runSomething --factory org.opennms.plugins.shellexecutor.services
 property-set jexlFilter 'alarm == true'
