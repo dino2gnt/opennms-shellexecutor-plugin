@@ -22,7 +22,8 @@ Access the [Karaf shell](https://opennms.discourse.group/t/karaf-cli-cheat-sheet
 ```
 feature:install opennms-plugins-shellexecutor
 ```
-Script Location
+#### Script Location
+
 Create a directory `$OPENNMS_HOME/etc/shellExecScripts` for your executable scripts.  This is the working directory for everything executed by the shellexecutor plugin. Commands must exist at this location and be executable by the user as which OpenNMS runs (typically `opennms`).
 
 Configure global options (affects all services for this instance):
