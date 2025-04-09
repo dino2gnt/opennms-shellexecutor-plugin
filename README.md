@@ -1,4 +1,4 @@
-# OpenNMS Shell Executor Plugi
+# OpenNMS Shell Executor Plugin
 
 ## Overview
 
