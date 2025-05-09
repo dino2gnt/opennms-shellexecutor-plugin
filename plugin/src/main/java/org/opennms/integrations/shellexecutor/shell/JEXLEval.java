@@ -41,9 +41,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.opennms.integration.api.v1.dao.AlarmDao;
 import org.opennms.integration.api.v1.model.Alarm;
 import org.opennms.integrations.shellexecutor.ShellExecutor;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.util.Map;
 
@@ -63,6 +60,9 @@ public class JEXLEval implements Action {
     @Option(name = "-c", aliases = "--count", description = "Only show the number of matching alarms, without alarm data", required = false, multiValued = false)
     Boolean onlyCount = false;
 
+    @Option(name = "-a", aliases = "--alarm-id", description = "Lookup an alarm by id and evaluate the given expression against it.")
+    private Integer alarmId;
+
     @Override
     public Object execute() {
         JexlEngine jexl = new JexlBuilder().create();
@@ -70,6 +70,7 @@ public class JEXLEval implements Action {
 
         int numAlarmsProcessed = 0;
         boolean didMatchAtLeastOneAlarm = false;
+        boolean alarmIdMatched = false;
         int matchedAlarmCount = 0;
 
         if (toPayload && onlyCount) {
@@ -79,17 +80,24 @@ public class JEXLEval implements Action {
         for (Alarm alarm : alarmDao.getAlarms()) {
             numAlarmsProcessed++;
             boolean didMatch = ShellExecutor.testAlarmAgainstExpression(e, alarm);
+
+            if (alarmId != null && alarm.getId().equals(alarmId)) {
+                System.out.printf("Alarm with ID '%d' has reduction key: '%s'\n", alarmId, alarm.getReductionKey());
+                alarmIdMatched = true;
+                System.out.printf("Expression evaluates: %s\n", didMatch);
+            }
             if (didMatch) {
-                if (!onlyCount) {
-                    System.out.println("MATCHED: " + alarm);
-                    if (toPayload) {
-                        Map<String,String> payload = ShellExecutor.doPayload(alarm);
-                        System.out.println("Environment payload: ");
-                        for(Map.Entry<String, String> en: payload.entrySet()) {
-                            System.out.print("    " + en.getKey() + " = ");
-                            System.out.println("\"" + en.getValue() + "\"");
-                        }
+                if (!onlyCount && alarmId == null) {
+                    System.out.println("MATCHED: " + alarm + "\n");
+                }
+                if (toPayload && !onlyCount && (alarmId == null || alarm.getId().equals(alarmId))) {
+                    Map<String,String> payload = ShellExecutor.doPayload(alarm);
+                    System.out.println("Environment payload: ");
+                    for(Map.Entry<String, String> en: payload.entrySet()) {
+                        System.out.print("    " + en.getKey() + " = ");
+                        System.out.println("\"" + en.getValue() + "\"");
                     }
+                    System.out.println();
                 }
                 matchedAlarmCount++;
                 didMatchAtLeastOneAlarm = true;
@@ -97,11 +105,13 @@ public class JEXLEval implements Action {
         }
 
         if (numAlarmsProcessed < 1) {
-            System.out.println("No alarms present.");
+            System.out.println("\nNo alarms present.\n");
         } else if (!didMatchAtLeastOneAlarm) {
-            System.out.printf("No alarms matched (out of %d alarms.)\n", numAlarmsProcessed);
+            System.out.printf("\nNo alarms matched (out of %d alarms.)\n", numAlarmsProcessed);
+        } else if (alarmId != null && !alarmIdMatched) {
+            System.out.printf("\nNo alarm with ID %d was found!\n", alarmId);
         } else if (didMatchAtLeastOneAlarm && matchedAlarmCount > 0) {
-            System.out.printf("Matched %d alarms (out of %d alarms.)\n", matchedAlarmCount, numAlarmsProcessed);
+            System.out.printf("\nExpression matched %d alarms (out of %d alarms.)\n", matchedAlarmCount, numAlarmsProcessed);
         }
         return null;
     }

@@ -42,6 +42,41 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- when the bundle is built, this exposes the examples as /type/classifier for reference in features.xml -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>src/main/resources/shellExecScripts/examples/echoEnv.sh</file>
+                                    <type>cfg</type>
+                                    <classifier>echoenv</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>src/main/resources/shellExecScripts/examples/mailTo.sh</file>
+                                    <type>cfg</type>
+                                    <classifier>mailto</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>src/main/resources/shellExecScripts/README</file>
+                                    <type>cfg</type>
+                                    <classifier>readme</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

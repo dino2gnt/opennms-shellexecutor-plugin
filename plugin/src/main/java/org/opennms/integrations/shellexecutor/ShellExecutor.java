@@ -152,7 +152,7 @@ public class ShellExecutor implements AlarmLifecycleListener, Closeable {
         }
 
         Map<String,String> e = new LinkedHashMap<>();
-        e.put("action", "RESOLVE");
+        e.put("action", "DELETED");
         e.put("reductionKey", reductionKey);
         LOG.info("Sending clear for deleted alarm with reduction-key: {}", reductionKey);
         boolean exitCode = false;
@@ -206,7 +206,8 @@ public class ShellExecutor implements AlarmLifecycleListener, Closeable {
         e.put("client", pluginConfig.getClient());
         e.put("clientUrl", String.format(pluginConfig.getAlarmDetailsUrlPattern(), alarm.getId()));
         e.put("command", serviceConfig.getCommand());
-        return doPayload(alarm);
+        e.putAll(doPayload(alarm));
+        return e;
     }
 
     public static Map<String, String> doPayload(Alarm alarm) {
@@ -221,6 +222,8 @@ public class ShellExecutor implements AlarmLifecycleListener, Closeable {
             e.put("action", "TRIGGER");
         }
 
+        // ID
+        e.put("id", alarm.getId().toString());
         // Log message
         e.put("logmessage", alarm.getLogMessage().trim());
         // Severity -> Severity
