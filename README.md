@@ -24,7 +24,7 @@ feature:install opennms-plugins-shellexecutor
 ```
 #### Script Location
 
-Create a directory `$OPENNMS_HOME/etc/shellExecScripts` for your executable scripts.  This is the working directory for everything executed by the shellexecutor plugin. Commands must exist at this location and be executable by the user as which OpenNMS runs (typically `opennms`).
+The plugin will create a directory `$OPENNMS_HOME/etc/shellExecScripts` when installed.  This is the working directory for everything executed by the shellexecutor plugin. Commands must exist at this location and be executable by the user as which OpenNMS runs (typically `opennms`).  There are example scripts included in the `examples/` subdirectory.
 
 #### Configure global options (affects all services for this instance):
 ```
@@ -72,6 +72,8 @@ OPTIONS
                 Display this help message
         -p, --topayload
                 Also display matched alarms as shell environment payload
+        -a, --alarm-id
+                Lookup an alarm by id and evaluate the given expression against it.
         -c, --count
                 Only show the number of matching alarms, without alarm data
           
