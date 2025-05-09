@@ -1,0 +1,6 @@
+This directory is created automatically by the opennms-shellexecutor-plugin and 
+is used to hold the scripts it will execute.  You can find example scripts
+in the 'examples' directory.
+
+You can learn more about the shellexecutor plugin at:
+https://github.com/dino2gnt/opennms-shellexecutor-plugin
