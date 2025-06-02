@@ -231,20 +231,28 @@ public class ShellExecutor implements AlarmLifecycleListener, Closeable {
         // Use the node label as the source if available
         if (alarm.getNode() != null) {
             e.put("source", alarm.getNode().getLabel());
+            // Add the event's nodelabel to details
+            if (alarm.getNode().getLabel() != null && !e.containsKey("nodeLabel")) {
+                e.put("nodeLabel", alarm.getNode().getLabel());
+            }
+            // node asset
+            if (alarm.getNode().getAssetRecord().toString() != null && !e.containsKey("nodeAsset")) {
+                e.put("nodeAsset", alarm.getNode().getAssetRecord().toString());
+            }
+            // Node meta
+            if (alarm.getNode().getMetaData().toString() != null && !e.containsKey("nodeMetaData")) {
+                e.put("nodeMetaData", alarm.getNode().getMetaData().toString());
+            }
+            // Add categories
+            if (alarm.getNode().getCategories() != null && !e.containsKey("node_categories")) {
+                e.put("node_categories", alarm.getNode().getCategories().toString());
+            }
+            //Add the first IP address
+            if (alarm.getNode().getIpInterfaces().get(0).getIpAddress() != null && !e.containsKey("node_ipAddress")) {
+                e.put("node_ipAddress", alarm.getNode().getIpInterfaces().get(0).getIpAddress().toString());
+            }
         } else {
             e.put("source", "unknown");
-        }
-        // Add the event's nodelabel to details
-        if (alarm.getNode().getLabel() != null && !e.containsKey("nodeLabel")) {
-            e.put("nodeLabel", alarm.getNode().getLabel());
-        }
-        // Add categories
-        if (alarm.getNode().getCategories() != null && !e.containsKey("node_categories")) {
-            e.put("node_categories", alarm.getNode().getCategories().toString());
-        }
-        //Add the first IP address
-        if (alarm.getNode().getIpInterfaces().get(0).getIpAddress() != null && !e.containsKey("node_ipAddress")) {
-            e.put("node_ipAddress", alarm.getNode().getIpInterfaces().get(0).getIpAddress().toString());
         }
         // Add all of the event parameters as custom details
         final DatabaseEvent dbEvent = alarm.getLastEvent();
