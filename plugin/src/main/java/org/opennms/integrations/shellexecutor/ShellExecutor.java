@@ -226,10 +226,14 @@ public class ShellExecutor implements AlarmLifecycleListener, Closeable {
         e.put("id", alarm.getId().toString());
         // Log message
         e.put("logmessage", alarm.getLogMessage().trim());
+        // Description
+        if (alarm.getDescription() != null)
+            e.put("description", alarm.getDescription().trim());
         // Severity -> Severity
         e.put("severity", alarm.getSeverity().toString());
         // Use the node label as the source if available
         if (alarm.getNode() != null) {
+            e.put("nodeId", String.valueOf(alarm.getNode().getId()));
             e.put("source", alarm.getNode().getLabel());
             // Add the event's nodelabel to details
             if (alarm.getNode().getLabel() != null && !e.containsKey("nodeLabel")) {
@@ -237,15 +241,48 @@ public class ShellExecutor implements AlarmLifecycleListener, Closeable {
             }
             // node asset
             if (alarm.getNode().getAssetRecord().toString() != null && !e.containsKey("nodeAsset")) {
-                e.put("nodeAsset", alarm.getNode().getAssetRecord().toString());
+                StringBuilder assetkvlist = new StringBuilder();
+                Map<String,String> assets = new LinkedHashMap<>();
+                if (alarm.getNode().getAssetRecord().getBuilding() != null)
+                   assets.put("building", alarm.getNode().getAssetRecord().getBuilding());
+                if (alarm.getNode().getAssetRecord().getAssetNumber() != null)
+                    assets.put("assetNumber", alarm.getNode().getAssetRecord().getAssetNumber());
+                if (alarm.getNode().getAssetRecord().getDepartment() != null)
+                    assets.put("department", alarm.getNode().getAssetRecord().getDepartment());
+                if (alarm.getNode().getAssetRecord().getDescription() != null)
+                    assets.put("description", alarm.getNode().getAssetRecord().getDescription());
+                if (alarm.getNode().getAssetRecord().getDivision() != null)
+                    assets.put("division", alarm.getNode().getAssetRecord().getDivision());
+                if (alarm.getNode().getAssetRecord().getFloor() != null)
+                    assets.put("floor", alarm.getNode().getAssetRecord().getFloor());
+                if (alarm.getNode().getAssetRecord().getModelNumber() != null)
+                    assets.put("modelNumber", alarm.getNode().getAssetRecord().getModelNumber());
+                if (alarm.getNode().getAssetRecord().getOperatingSystem() != null)
+                    assets.put("operatingSystem", alarm.getNode().getAssetRecord().getOperatingSystem());
+                if (alarm.getNode().getAssetRecord().getRegion() != null)
+                    assets.put("region", alarm.getNode().getAssetRecord().getRegion());
+                if (alarm.getNode().getAssetRecord().getVendor() != null)
+                    assets.put("vendor", alarm.getNode().getAssetRecord().getVendor());
+                if (alarm.getNode().getAssetRecord().getGeolocation() != null)
+                    assets.put("geolocation", alarm.getNode().getAssetRecord().getGeolocation().toString());
+                assets.forEach((k, v) -> assetkvlist.append(k+"="+v+","));
+                if (!assets.isEmpty())
+                    e.put("nodeAsset", String.valueOf(assetkvlist.substring(0, assetkvlist.length() - 1)));
             }
             // Node meta
             if (alarm.getNode().getMetaData().toString() != null && !e.containsKey("nodeMetaData")) {
-                e.put("nodeMetaData", alarm.getNode().getMetaData().toString());
+                StringBuilder metakvlist = new StringBuilder();
+                alarm.getNode().getMetaData().forEach(m -> metakvlist.append(m.getContext()+"_"+m.getKey()+"="+m.getValue()+","));
+                // trim off the last comma
+                if (metakvlist.length() != 0)
+                    e.put("nodeMetaData", String.valueOf(metakvlist.substring(0, metakvlist.length() - 1)));
             }
             // Add categories
             if (alarm.getNode().getCategories() != null && !e.containsKey("node_categories")) {
-                e.put("node_categories", alarm.getNode().getCategories().toString());
+                StringBuilder catList = new StringBuilder();
+                alarm.getNode().getCategories().forEach(k -> catList.append(k+","));
+                if (catList.length() != 0)
+                   e.put("node_categories", String.valueOf(catList.substring(0, catList.length() - 1)));
             }
             //Add the first IP address
             if (alarm.getNode().getIpInterfaces().get(0).getIpAddress() != null && !e.containsKey("node_ipAddress")) {
@@ -349,6 +386,7 @@ public class ShellExecutor implements AlarmLifecycleListener, Closeable {
         if (!success) {
             eventForwarder.sendAsync(ImmutableInMemoryEvent.newBuilder()
                     .setUei(SEND_EVENT_FAILED_UEI)
+                    .setNodeId(1)
                     .setSource(ShellExecutor.class.getName())
                     .addParameter(ImmutableEventParameter.newBuilder()
                             .setName("reductionKey")
